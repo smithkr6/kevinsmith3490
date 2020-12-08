@@ -1,6 +1,7 @@
 deployed version for this project: https://smithkr6.github.io/kevinsmith3490/
 
-#UI information
+#UI information#
+
 Rather than automatically moving the Map interface to the user's location I made it go to belk hall to a marker I prepared placed in the view--I did this so you don't have to create new markers at your location just to test it.
 
 tap/click the marker that is on screen, this triggers a popup displaying on the marker and performs the following:
@@ -20,8 +21,10 @@ tap/click the marker that is on screen, this triggers a popup displaying on the 
 		-HTML formatted text: a popup window that processes the raw html data and displays it as intended to show that the parsed html data is valid.
 
 	-Details regarding the methodology for parsing the json into html are included in the project report
-	
-#Additional UI information
+
+
+#Additional UI informatio#
+
 if want to you can use the mock up interface for creating new markers to the map--when a marker has it's location confirmed, you can click the underlined "comment" link which will direct you to a template for a new reddit post (with an pre initialized title in the text field representing the coordinates at which the marker's position was confirmed). 
 After posting the reddit post you can navigate to the map again and view the new marker initialized on the page.
 
