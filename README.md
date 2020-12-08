@@ -1,70 +1,28 @@
-# Getting Started with Create React App
+deployed version for this project: https://smithkr6.github.io/kevinsmith3490/
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+#UI information
+Rather than automatically moving the Map interface to the user's location I made it go to belk hall to a marker I prepared placed in the view--I did this so you don't have to create new markers at your location just to test it.
 
-## Available Scripts
+tap/click the marker that is on screen, this triggers a popup displaying on the marker and performs the following:
+	-the main feed of where the subreddit where markers are stored, reddit.com/r/unfortunatemap is scraped, and the json data for each post in the main feed is parsed into data that initializes the markers on the map. Markers on the map contain the author of the marker, and the text text they posted about the marker. (the marker includes none of the comments made to the post because that would be too much data to scrape all at once)
+	
+	-in the popup a button is placed. This button retrieves all the comments made to that marker from the url of that single full reddit post made to reddit.com/r/unfortunatemap/<coordinates>. The title of reddit posts is initialized to a regex enforced title specifying the format of how I'm querying the markers.
+	
+	#SCOPE OF THE PROJECT BEGINS HERE#
+	-The json data retieved when the button in a marker's popup is selected is parsed into an  string that is formatted as appropriately indented html such that when loaded into a browser, the indented tree hierarchy of comments is properly displayed.
 
-In the project directory, you can run:
+	-this html string displayed in the marker label, but for simplicity sake for the scope of this project, I set three popup windows to be displayed once the button in the label is pressed:
+		
+		-JSON data: a popup displaying a string representation of the json data that is parsed (it is parsed as string data in a functional manner using mostly recursive implementations of javascript's equivalent of Haskell's Cons.)
+		
+		-Raw HTML data: a popup displaying the raw html data that my parser outputs on each instance of a button press.
 
-### `npm start`
+		-HTML formatted text: a popup window that processes the raw html data and displays it as intended to show that the parsed html data is valid.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+	-Details regarding the methodology for parsing the json into html are included in the project report
+	
+#Additional UI information
+if want to you can use the mock up interface for creating new markers to the map--when a marker has it's location confirmed, you can click the underlined "comment" link which will direct you to a template for a new reddit post (with an pre initialized title in the text field representing the coordinates at which the marker's position was confirmed). 
+After posting the reddit post you can navigate to the map again and view the new marker initialized on the page.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Previous version of this project with the geolocator still implemented: http://unfortunatemap.icu
