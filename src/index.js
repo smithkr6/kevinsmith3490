@@ -1,5 +1,4 @@
-//PROJECT BEGINS ON LINE 212
-
+//THE FUNCTIONAL PARSER OF JSON TO HTML BEGINS ON LINE 212
 
 import React from 'react';
 import ReactDOM from 'react-dom';
