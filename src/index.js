@@ -1,16 +1,4 @@
-/*
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-*/
-
+//PROJECT BEGINS ON LINE 212
 
 
 import React from 'react';
@@ -21,18 +9,17 @@ import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
 import mapboxgl from 'mapbox-gl';
 import $ from 'jquery'; 
-//import mapboxgl from 'mapbox-gl'; // or "const mapboxgl = require('mapbox-gl');"
 
 
-//random 
+//random coordinates to start zoom animation from
 var lon = -78.8359;
 var lat = 35.7814;
 mapboxgl.accessToken = 'pk.eyJ1Ijoic21pdGhrcjYiLCJhIjoiY2s1eng5cXhkMDBqYzNrbGlxY2llamwzYiJ9.EiSYrIube_whxrve-t_47Q';
+
+
 class Application extends React.Component {
   
    constructor(props) {
-
-
       super(props);
       this.state = {
          lng: lon,
@@ -56,7 +43,7 @@ class Application extends React.Component {
    // create geolocateControl object and set settings-- 
    // creating this GeoControl must happen before creating the map so it can be configured before it's implemented
    // geolocate takes a couple seconds also, so giving it a headstart makes the ui less confusing as its loading
-   //var geolocate = new mapboxgl.GeolocateControl({positionOptions: {enableHighAccuracy: true}, trackUserLocation: true}); //GeolocateControl settings 
+   // var geolocate = new mapboxgl.GeolocateControl({positionOptions: {enableHighAccuracy: true}, trackUserLocation: true}); //GeolocateControl settings 
    
    //geolocate.on('geolocate', function(e) { //on geolocate global coord position updates
       //boone coordinates to show test markers that use html popups as examples.
@@ -117,7 +104,7 @@ class Application extends React.Component {
 */ 
 
    //------------------------------
-   //parsing Post previews from main feed into map markers 
+   //Helper functions for parsing Post previews from main feed into map markers 
    //------------------------------
    function cleanUp(txt) {
       if (keepLine(getLine(txt)))   return getLine(txt) + cleanUp(removeTopLine(txt));
@@ -129,12 +116,11 @@ class Application extends React.Component {
       if  (line.includes('"selftext"')) return true;
    }
    function getLine(txt) {
-      //return txt.split('\n', 1) + '\n'; //this works 
       if (txt[0]!== '\n') return txt[0] + getLine(txt.substring(1));
       else return '\n';
    }
    function removeTopLine(txt) {
-      //return txt.substring(txt.indexOf("\n") + 1); this sort of works (too big on stack)
+      //return txt.substring(txt.indexOf("\n") + 1); // this works but crashes bc too big 
       if (txt[0] !== '\n') return removeTopLine(txt.substring(1));
       else return txt.substring(1); //for this else, txt[0] == '\n' so return whats after the \n with txt.substring(1) 
    }
@@ -148,13 +134,10 @@ class Application extends React.Component {
     /*
     * GRAB MAIN FEED post previews from reddit.com/r/unfortunateMap
     *  retrieve json data for the entire feed of r/unfortunateMap
-    *  filter out the unneeded json fields 
-    *  and store the leftover data in a json formatted string, strtemp.
     *  $.getJSON is async, so going to parse what it receives in its promise
     */
    function grabFeedJSON(link)  {
       return $.getJSON(link, function (dat) {
-         //return JSON.stringify(dat.data);
       });
    }
 
@@ -237,29 +220,20 @@ class Application extends React.Component {
    */   
    var markerpost = {"title": "", "author": "", "body": "", "replies": []};   //get comments and display
 
-      //FUNCTIONS
-      //function that grabs json of a marker post url
+   //function that grabs json of a marker post url
    function grabMarkerJSON(link)  {
       return $.getJSON(link, function (dat) {
-        // return JSON.stringify(dat);
       });
    }
 
-      //because the request is async, scoping the functional logic within the .then of the grabMarkerJSON function--
-      //the json returned by grabMarkerJson is passed as the argument the .then inline function as json_data.
+   //because the request is async, keeping the functional logic within the .then of the grabMarkerJSON function--
+   //the json returned by grabMarkerJson is passed as the argument the .then inline function as json_data.
    function updateSelectedMarker(url){
       console.log("updateSelectedMarker reached");
       grabMarkerJSON(url).then(function(json_data) {               //this is "main" function for the functional json to HTML converter
 
-         markerpost = { 
-                        title : json_data[0].data.children[0].data.title,   //title   
-                        author : json_data[0].data.children[0].data.author,     //author
-                        body : json_data[0].data.children[0].data.selftext   //body
-                     };
-         
-
-
          //recursive JSON sorting algorithm alphabetically by property (key)
+         //This function is imperative, it just prepares the data for the parser
          function sortObject(obj) {
             if(typeof obj !== 'object')   return obj;
                var temp = {};
@@ -271,69 +245,66 @@ class Application extends React.Component {
                  temp[keys[index]] = sortObject(obj[keys[index]]);       
                return temp;
          }
-         //line parsers (intended for a single line)
-
-         function authorLine(str) {
-            //first split is incase an author has a quot in their name 
-            //split splits the string by quot characters into an array
-            //slice(3) returns a new array of its elements from index 3 to the last 
-            //last slice  slices last quotation and a comma off end of string
+         
+         //-------------------
+         // HELPER FUNCTIONS
+         //--------------------
+         
+        function authorLine(str) {
+            //first split is incase an author has a quot in their name (.split splits the string by quot characters into an array)
+            //slice(3) returns a new array of its elements from index 3 to the last index 
+            //the final slice slices the last quotation and a comma off end of string
             if (removeSpaces(str).substring(0, 8) ===  '"author"')  return str.split('\\"').join('"').split('"').slice(3).join('"').slice(0,-1); 
             else return "";
          }
-
+         
          function bodyLine(str) {
+            //if a copy of str without spaces matches the pattern of starting with '"body"' then return the data content that follows
             if (removeSpaces(str).substring(0, 6) ===  '"body"') return str.split('\\"').join('"').split('"').slice(3).join('"').slice(0,-1);   
             else return "";
          }
+        
          function removeComma(str) {
-            if (str[str.length-1] === ',') return str.substring(0,str.length-1); //if last char is comman return string w/o last char
+            //if the last char is comma, return a copy of str that has the last char removed
+            if (str[str.length-1] === ',') return str.substring(0,str.length-1); //if last char is comma, return string w/o last char
             else return str;
          } 
-         //full string parsers (intended for multiple lines)
+   
          function removeSpaces(str) {         
+            //return a copy of str with its spaces removed 
             if (str === undefined) return "";
             else {
                return str.split(" ").join("");
             }
          }
 
-         /*returns true if it's fed string that is a desired property:
-            author, body, replies, or {, or }      */
+         //checks if str contains desireable data worth keeping,
          function isKeeper(str) {
             if (
-                 // str !== undefined       ||
-                  authorLine(str) !== ""  || //authorLine returns null if it doesn't start with "author"
-                  bodyLine(str)  !==  ""     //bodyLine returns null if it doesn't start with "body"
+                  authorLine(str) !== ""  || //authorLine returns "" if it doesn't start with "author"
+                  bodyLine(str)  !==  ""     //bodyLine returns "" if it doesn't start with "body"
                )
                return true;
             return false;
          }
-
-         //TODO: recursive implementation of reValidLInes
-         //checks if each element(each line) is a keeper.
+        
+         //takes an array of lines and returns an array of lines worth keeping
          //argument is array of lines--each element is a str representation of json text
          function retValidLines(iArr) {
             if (iArr[0] === undefined) return [""];
             else if (isKeeper(iArr[0])) { 
-               var lelem = removeComma(iArr.shift());      //remove last element to keep and ensure no comma at end
-               var temd = retValidLines(iArr); 
-               temd.unshift(lelem);
-               return temd;                   
+               return retValidLines(iArr).unshift(removeComma(iArr.shift());       //this prepends the commaless str to beginning of array              
             }
-
             else {//dontkeep
-               iArr.shift();
-               return retValidLines(iArr);   //return a retry passed a copy of the array w/o the invalid element
+               iArr.shift();                 //used shift because shallowcopy causes stackoverflow for this function
+               return retValidLines(iArr);   //return a retry that is passed a copy of the array w/o the invalid element
             }
          }
 
-         //for retrieving n lines of a multiline string into an n element array of strings
-         //use the n argument for optimizations on larger comment threads for cache performance
+         // retrieves n lines of a multiline string into an n element array of strings (n argument added do data can be processed in blocks if needed, (blocking not implemented yet)
          function jsonSectionSelectToArr(json_formatted_string, n) {
             return json_formatted_string.split('\n', n);          //split elements at newline into an array 
          }
-
 
          //return number of spaces that precede the first non-space character 
          function countSpaces(str) {
@@ -345,32 +316,30 @@ class Application extends React.Component {
          function replaceWithHTMLbreaks(str) {
             return str.split("\n").join("<br>")
          }
-         //
-         //pass an array. return array of elements up until an element with a different countSpaces is reached
-         function getSiblings(arr) {  
-            var i=0;
-            var spaces = countSpaces(arr[0]);
-            while(spaces === countSpaces(arr[i])) i++;
-            return arr.splice(0,i);
-            if (countSpaces(arr[0]) === countSpaces(arr[2])) return arr.slice(0, 3).concat(getSiblings(arr.slice(3,arr.length)));
-            else return;
-         }
+       
          //returns the html code for line breaks
          function hrTag(thiccness) {
             return '<hr style = display: block; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; border-style: inset; border-width:' + thiccness.toString() + 'px;">';
          }       
-         //replace preceding spaces that remain from the JSON.stringify with html tak for a block indentation of a size based on the number of spaces that were there
+        
+         //replace preceding spaces that remain from the JSON.stringify with the html tag for a block indentation of a size based on the number of spaces that were there
          function formatHTMLComment(str) {
             if (authorLine(str) !== "") return hrTag(1) + '<div style="color: grey;margin-left: ' + ((countSpaces(str)-3)/5).toString() + 'em;">' + authorLine(str) + "</div>";
             if (bodyLine(str) !== "")   return '<div style="color: darkblue;margin-left: ' + ((countSpaces(str)-3)/5).toString() + 'em;">-> ' + bodyLine(str) + "</div>";
          }
-         //formats the line of an 
+        
+         //formats the line of an arr as html
          function commentsArrToHTMLArr(arr) {
             if (arr[0] !== undefined) return [formatHTMLComment(arr[0])].concat(commentsArrToHTMLArr(arr.slice(1)));
          }
+        
+         //simply returns string representation of JSON data
          function jsonToString(json) {
             return JSON.stringify(json, undefined, 1);
          }
+        
+         //builds the full HTML representation of the data on the marker, 
+         //combines the original marker annotation with the parsed comment thread.
          function fullHTML(arr) {
             return(     //explicitly placing the main post's title, author, and body(selftext) in HTML with the converted array html lines that was passed as an argument
                "<body><h3><b><i>" + json_data[0].data.children[0].data.title  + "</i><br><sub>" + json_data[0].data.children[0].data.author + "</sub></b></h3><p>" + json_data[0].data.children[0].data.selftext + "</p>" + hrTag(3) +"<p>"  + 
@@ -378,13 +347,18 @@ class Application extends React.Component {
                "</p><body>"
             );
          }
-
+          
+         
+         //DOM elements where this html will be inserted are named in the DOM as "section" + coordinates of the marker
          var retElement = document.getElementById('section' + json_data[0].data.children[0].data.title.toString());
+         
          //update the html for the comments section with the follwing compositinon of functions
          retElement.innerHTML = fullHTML(commentsArrToHTMLArr(retValidLines(jsonSectionSelectToArr(jsonToString(sortObject(json_data))))));
          
          //these popups are to display the before and after data that I parsed for this project
          popUpCal(json_data, fullHTML(commentsArrToHTMLArr(retValidLines(jsonSectionSelectToArr(jsonToString(sortObject(json_data)))))));
+         
+         //log the original json data and parsed html to the console
          console.log("json data that is parsed\n" + JSON.stringify(json_data,undefined, 4));
          console.log("fullHTML\n" + fullHTML(commentsArrToHTMLArr(retValidLines(jsonSectionSelectToArr(jsonToString(sortObject(json_data)))))));
 
@@ -471,15 +445,12 @@ class Application extends React.Component {
             .setHTML('<h3> Drag this Marker </h3><h9><p>'+ marker.getLngLat().lng  + ',\n ' + marker.getLngLat().lat + '</p></h9>' ))    //load the html to go in popup including markers current coordinates
          marker.addTo(map).togglePopup();                                                    //add marker to the map and trigger the popup 
             
-
             //all while dragging the marker, the following occurs
          marker.on('drag', () => {                                                           //while marker is being dragged, perform function instance that's denoted by and following: ()
 
          newMarkerBtn.innerHTML = "<h3>Confirm Position</h3>\n<p>"+ marker.getLngLat().lng  + ',\n' + marker.getLngLat().lat + '</p>';             //move button
                 
          marker.setPopup(popup                               //continuously show a new popup...
-
-                    //.setHTML('<h3> Drag this Marker </h3><h6>'+ marker.getLngLat()  + '</h6>')) //...with continuously updated coordinates...   
             .setDOMContent(newMarkerBtn))
             .togglePopup();                                                             //...and continuously show the popup 
          });
