@@ -217,7 +217,7 @@ class Application extends React.Component {
    *----------------------------------------------------------------------------------------
    *----------------------------------------------------------------------------------------
    */   
-   var markerpost = {"title": "", "author": "", "body": "", "replies": []};   //get comments and display
+   // var markerpost = {"title": "", "author": "", "body": "", "replies": []};  
 
    //function that grabs json of a marker post url
    function grabMarkerJSON(link)  {
@@ -346,7 +346,9 @@ class Application extends React.Component {
                "</p><body>"
             );
          }
-          
+         
+         //FINAL HTML FOR THE COMMENT THREAD IS COMPOSITION OF THESE FUNCTIONS
+         var parsedJSONtoHTML = fullHTML(commentsArrToHTMLArr(retValidLines(jsonSectionSelectToArr(jsonToString(sortObject(json_data)))))));
          
          //DOM elements where this html will be inserted are named in the DOM as "section" + coordinates of the marker
          var retElement = document.getElementById('section' + json_data[0].data.children[0].data.title.toString());
@@ -354,7 +356,7 @@ class Application extends React.Component {
          //update the html for the comments section with the follwing compositinon of functions
          retElement.innerHTML = fullHTML(commentsArrToHTMLArr(retValidLines(jsonSectionSelectToArr(jsonToString(sortObject(json_data))))));
          
-         //these popups are to display the before and after data that I parsed for this project
+         //popUpCal creates popups that display the before and after data that is parsed for this project
          popUpCal(json_data, fullHTML(commentsArrToHTMLArr(retValidLines(jsonSectionSelectToArr(jsonToString(sortObject(json_data)))))));
          
          //log the original json data and parsed html to the console
@@ -363,8 +365,7 @@ class Application extends React.Component {
 
       });
    }
-
-
+   //creates 3 popups displaying json and raw html and formatted html
    function popUpCal(json, html){
       console.log("POPUP made");
       alert("there will be 3 popups triggerd by that 'show comments' button that appears on each marker:\n--the json data that will be parsed into html (displayed as a string)\n--the parsed html\n--proof that the html displays");
@@ -379,6 +380,10 @@ class Application extends React.Component {
       
    }
 
+     
+     
+     
+     
    /*---------------------------------------------------------------------------------------
    *----------------------------------------------------------------------------------------
    *----------------------USER INTERFACE----------------------------------------------------
