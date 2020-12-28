@@ -9,12 +9,10 @@ import * as serviceWorker from './serviceWorker';
 import mapboxgl from 'mapbox-gl';
 import $ from 'jquery'; 
 
-
 //random coordinates to start zoom animation from
 var lon = -78.8359;
 var lat = 35.7814;
 mapboxgl.accessToken = 'pk.eyJ1Ijoic21pdGhrcjYiLCJhIjoiY2s1eng5cXhkMDBqYzNrbGlxY2llamwzYiJ9.EiSYrIube_whxrve-t_47Q';
-
 
 class Application extends React.Component {
   
